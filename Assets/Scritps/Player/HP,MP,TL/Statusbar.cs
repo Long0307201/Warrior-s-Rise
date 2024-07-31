@@ -8,16 +8,17 @@ public class Statusbar : MonoBehaviour
     [Header("HP")]
     [SerializeField] private Image MaxHPBar;
     [SerializeField] private Image CurrentHPBar;
-    [SerializeField] private HP hp;
+
     [Header("MP")]
     [SerializeField] private Image MaxMPBar;
     [SerializeField] private Image CurrentMPBar;
-    [SerializeField]private MP mp;
+
     [Header("TL")]
     [SerializeField] private Image MaxTLBar;
     [SerializeField] private Image CurrentTLBar;
-    [SerializeField] private TL tL;
-    private void Start() 
+
+    [SerializeField] private PlayerStats playerStats;
+    private void Start()
     {
         CurrentHPBar.fillAmount = 1.0f;
         CurrentMPBar.fillAmount = 1.0f;
@@ -31,14 +32,14 @@ public class Statusbar : MonoBehaviour
     }
     private void HPBar()
     {
-        CurrentHPBar.fillAmount = hp.CurrentHP/hp.MaxHP;
+        CurrentHPBar.fillAmount = playerStats.CurrentHP / playerStats.MaxHP;
     }
     private void MPBar()
     {
-        CurrentMPBar.fillAmount = mp.CurrentMP/mp.MaxMP;
+        CurrentMPBar.fillAmount = playerStats.CurrentMP / playerStats.MaxMP;
     }
     private void TLBar()
     {
-        CurrentTLBar.fillAmount = tL.CurrentTL/tL.MaxTL;
+        CurrentTLBar.fillAmount = playerStats.CurrentTL / playerStats.MaxTL;
     }
 }

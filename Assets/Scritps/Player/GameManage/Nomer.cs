@@ -49,30 +49,28 @@ public class Nomer : MonoBehaviour
     private Vector2 ledgePos2;
     private Animator Anim;
     private Rigidbody2D rb;
-    private TL tl;
-    private HP hP;
+    private PlayerStats playerStats;
     private ComboAttack comboAttack;
-    private void Awake() 
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody2D> ();
-        Anim = GetComponent<Animator> ();
-        tl = GetComponent<TL>();
-        hP = GetComponent<HP>();
-        comboAttack = GetComponent<ComboAttack> ();
+        rb = GetComponent<Rigidbody2D>();
+        Anim = GetComponent<Animator>();
+        comboAttack = GetComponent<ComboAttack>();
+        playerStats = GetComponent<PlayerStats>();
     }
-    private void Update() 
+    private void Update()
     {
-        if(CanRun && !isSliding)
+        if (CanRun && !isSliding)
         {
             Run();
             WalkCrouch();
         }
         //Slide
-        if(Input.GetKeyDown(KeyCode.LeftShift) && !isSliding && isGround && !isSliding && tl.CurrentTL > tl.rateTLDown)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isSliding && isGround && !isSliding && playerStats.CurrentTL > playerStats.rateTLDown)
         {
             StartSlide();
         }
-        if(isSliding)
+        if (isSliding)
         {
             slideTime += Time.deltaTime;
             if (slideTime >= slideDuration)
@@ -97,10 +95,10 @@ public class Nomer : MonoBehaviour
         Anim.SetBool("Ground", isGround);
         Anim.SetFloat("Jump", rb.velocity.y);
     }
-    private void FixedUpdate() 
+    private void FixedUpdate()
     {
         CheckAll();
-        if(!canClimbLedge)
+        if (!canClimbLedge)
         {
             CheckWallSliding();
         }
@@ -109,23 +107,23 @@ public class Nomer : MonoBehaviour
 
     private void Run()
     {
-        Hozion = Input.GetAxis ("Horizontal");
+        Hozion = Input.GetAxis("Horizontal");
         currentSpeed = isCrouching ? SpeedWalkCrouch : SpeedWalk;
         rb.velocity = new Vector2(Hozion * currentSpeed, rb.velocity.y);
-        if(isWallSliding)
+        if (isWallSliding)
         {
-            if(rb.velocity.y < -WallSlidingSpeed )
+            if (rb.velocity.y < -WallSlidingSpeed)
             {
-                rb.velocity = new Vector2 (rb.velocity.x,-WallSlidingSpeed);
+                rb.velocity = new Vector2(rb.velocity.x, -WallSlidingSpeed);
             }
         }
-        Anim.SetBool("CrouchWalk",isCrouching && Hozion !=0);
+        Anim.SetBool("CrouchWalk", isCrouching && Hozion != 0);
     }
     private void Flip()
     {
-        if(canFlip)
+        if (canFlip)
         {
-            if((isFacingRight && Hozion < 0 )|| (!isFacingRight && Hozion > 0))
+            if ((isFacingRight && Hozion < 0) || (!isFacingRight && Hozion > 0))
             {
                 isFacingRight = !isFacingRight;
                 Vector3 face = transform.localScale;
@@ -136,40 +134,40 @@ public class Nomer : MonoBehaviour
     }
     public void Jump()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             rb.velocity = new Vector2(rb.velocity.x, PowerJump);
         }
-        
+
     }
     private void CheckAll()
     {
-        isGround = Physics2D.OverlapCircle(PointCheckGround.position,radius,GroundLayer);
+        isGround = Physics2D.OverlapCircle(PointCheckGround.position, radius, GroundLayer);
         Vector2 rayDirection = isFacingRight ? Vector2.right : Vector2.left;
-        isWall = Physics2D.Raycast(PointCheckWall.position,rayDirection,WallCheckDistance,WallLayer); 
+        isWall = Physics2D.Raycast(PointCheckWall.position, rayDirection, WallCheckDistance, WallLayer);
         // Physics2D.Raycast(Điểm check, vector,độ dài vector , layermask)
-        isTouchingLedge = Physics2D.Raycast(ledgeCheck.position,rayDirection, WallCheckDistance, LedgeLayer);
+        isTouchingLedge = Physics2D.Raycast(ledgeCheck.position, rayDirection, WallCheckDistance, LedgeLayer);
 
-        if(isWall && !isTouchingLedge && !ledgeDetected)
+        if (isWall && !isTouchingLedge && !ledgeDetected)
         {
             ledgeDetected = true;
             ledgePosBot = PointCheckWall.position;
         }
     }
-    private void  OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(PointCheckGround.position,radius);
+        Gizmos.DrawWireSphere(PointCheckGround.position, radius);
         Vector3 gizmoDirection = isFacingRight ? Vector3.right : Vector3.left;
-        Gizmos.DrawLine(PointCheckWall.position,PointCheckWall.position + gizmoDirection * WallCheckDistance);
-        Gizmos.DrawLine(ledgeCheck.position,ledgeCheck.position + gizmoDirection * WallCheckDistance);
+        Gizmos.DrawLine(PointCheckWall.position, PointCheckWall.position + gizmoDirection * WallCheckDistance);
+        Gizmos.DrawLine(ledgeCheck.position, ledgeCheck.position + gizmoDirection * WallCheckDistance);
     }
     private void WalkCrouch()
     {
         if (Input.GetKeyDown(KeyCode.S) && isGround)
         {
             isCrouching = !isCrouching;
-            Anim.SetBool("Crouch",isCrouching);
+            Anim.SetBool("Crouch", isCrouching);
             if (isCrouching)
             {
                 Anim.SetBool("Run", false);
@@ -178,19 +176,19 @@ public class Nomer : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D other)
     {
-        if(other.gameObject.CompareTag("Ham") )
+        if (other.gameObject.CompareTag("Ham"))
         {
             isCrouching = true;
             WalkCrouch();
         }
-        else 
+        else
         {
             isCrouching = false;
         }
     }
     private void CheckWallSliding()
     {
-        if(isWall && !isGround && rb.velocity.y<0)
+        if (isWall && !isGround && rb.velocity.y < 0)
         {
             isWallSliding = true;
             isWallJumping = true;
@@ -206,7 +204,7 @@ public class Nomer : MonoBehaviour
         if (isWallJumping && Input.GetKeyDown(KeyCode.Space))
         {
             isWallJumping = false;
-            Vector2 ForceToAdd = new Vector2((isFacingRight ? -1 : 1) * WallJumpForceX ,WallJumpForceY);
+            Vector2 ForceToAdd = new Vector2((isFacingRight ? -1 : 1) * WallJumpForceX, WallJumpForceY);
             rb.velocity = ForceToAdd;
             Invoke("ResetWallJump", 0.1f); // Hoãn việc đặt lại isWallJumping để đảm bảo nhân vật có đủ thời gian nhảy
         }
@@ -221,18 +219,18 @@ public class Nomer : MonoBehaviour
         slideTime = 0;
         Vector2 SlideVector = isFacingRight ? Vector2.left : Vector2.right;
         //rb.AddForce(SlideVector *PowerSlide);
-        rb.velocity= new Vector2(-SlideVector.x * slideSpeed, rb.velocity.y);
-        Anim.SetBool("Slide",isSliding);
+        rb.velocity = new Vector2(-SlideVector.x * slideSpeed, rb.velocity.y);
+        Anim.SetBool("Slide", isSliding);
     }
     private void EndSlide()
     {
         isSliding = false;
-        Anim.SetBool("Slide",isSliding);
+        Anim.SetBool("Slide", isSliding);
     }
     //Climp Ledge
     private void CheckLedgeClimb()
     {
-        if(ledgeDetected && !canClimbLedge)
+        if (ledgeDetected && !canClimbLedge)
         {
             canClimbLedge = true;
             if (isFacingRight)
@@ -246,7 +244,7 @@ public class Nomer : MonoBehaviour
                 ledgePos2 = ledgePosBot + new Vector2(-WallCheckDistance - Offset2.x, Offset2.y);
             }
             CanRun = false;
-            canFlip  = false;
+            canFlip = false;
             isWallSliding = false;
             Anim.SetBool("canClimbLedge", canClimbLedge);
         }

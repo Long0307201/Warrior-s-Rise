@@ -25,24 +25,34 @@ public class AttakPlayer : MonoBehaviour
 
     void Update()
     {
-        if (Vector3.Distance(transform.position, player.position) <= detectionRadius)
+        if (player != null)
         {
-            isChasingPlayer = true;
+            if (Vector3.Distance(transform.position, player.position) <= detectionRadius)
+            {
+                isChasingPlayer = true;
+            }
+            else
+            {
+                isChasingPlayer = false;
+            }
+
+            if (isChasingPlayer)
+            {
+                ChasePlayer();
+            }
+            else
+            {
+                Patrol();
+            }
         }
         else
         {
+            // Nếu player null, có thể dừng hành vi hoặc thêm logic tìm lại player
             isChasingPlayer = false;
+            Patrol(); // Hoặc hành vi mặc định khác khi không tìm thấy player
         }
 
-        if (isChasingPlayer)
-        {
-            ChasePlayer();
-        }
-        else
-        {
-            Patrol();
-        }
-        //anim.SetBool("Attack",isChasingPlayer);
+        //anim.SetBool("Attack", isChasingPlayer);
         FlipSprite();
     }
 
@@ -62,7 +72,7 @@ public class AttakPlayer : MonoBehaviour
 
     void ChasePlayer()
     {
-        Vector3 direction = (player.position - transform.position ).normalized;
+        Vector3 direction = (player.position - transform.position).normalized;
         rb.velocity = direction * speed;
     }
 

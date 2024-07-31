@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundCheckRadius;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Transform groundCheckPoint;
+    [SerializeField] private float currentSpeed1;
 
     private float horizontalInput;
     private float currentSpeed;
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private float wallJumpForceX;
     [SerializeField] private float wallJumpForceY;
-    
+
     private bool isWallSliding;
     private bool isTouchingWall;
     //private bool isWallJumping;
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour
     [Header("Slide")]
     [SerializeField] private float slideSpeed = 10f;
     [SerializeField] private float slideDuration = 0.5f;
-    
+
     private float slideTime = 0f;
     public bool isSliding;
 
@@ -56,21 +57,20 @@ public class PlayerController : MonoBehaviour
 
     private Animator animator;
     private Rigidbody2D rb;
-    private TL tl;
-    private HP hp;
+    private PlayerStats playerStats;
     private ComboAttack comboAttack;
 
-    private void Awake() 
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        tl = GetComponent<TL>();
-        hp = GetComponent<HP>();
+        playerStats = GetComponent<PlayerStats>();
         comboAttack = GetComponent<ComboAttack>();
     }
 
-    private void Update() 
+    private void Update()
     {
+        if (Time.timeScale == 0f) return;
         if (canRun && !isSliding)
         {
             Move();
@@ -85,8 +85,9 @@ public class PlayerController : MonoBehaviour
         UpdateAnimations();
     }
 
-    private void FixedUpdate() 
+    private void FixedUpdate()
     {
+        if (Time.timeScale == 0f) return;
         PerformChecks();
         if (!canClimbLedge)
         {
@@ -132,7 +133,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (!isGrounded && canDoubleJump)
             {
-                rb.velocity = new Vector2(rb.velocity.x, jumpPower*(2/3));
+                rb.velocity = new Vector2(rb.velocity.x, jumpPower * (2 / 3));
                 canDoubleJump = false; // Chỉ nhảy đôi một lần
             }
         }
@@ -140,7 +141,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleSlide()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isSliding && isGrounded && tl.CurrentTL > tl.rateTLDown)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isSliding && isGrounded && playerStats.CurrentTL > playerStats.rateTLDown)
         {
             StartSlide();
         }
@@ -209,7 +210,7 @@ public class PlayerController : MonoBehaviour
 
     private void PerformWallJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isTouchingWall )
+        if (Input.GetKeyDown(KeyCode.Space) && isTouchingWall)
         {
             //isWallJumping = false;
             Vector2 jumpForce = new Vector2((isFacingRight ? -1 : 1) * wallJumpForceX, wallJumpForceY);
@@ -229,11 +230,11 @@ public class PlayerController : MonoBehaviour
         if (ledgeDetected && !canClimbLedge)
         {
             canClimbLedge = true;
-            ledgeClimbPos1 = isFacingRight 
+            ledgeClimbPos1 = isFacingRight
                 ? ledgeBottomPos + new Vector2(wallCheckDistance - ledgeClimbOffset1.x, ledgeClimbOffset1.y)
                 : ledgeBottomPos + new Vector2(-wallCheckDistance + ledgeClimbOffset1.x, ledgeClimbOffset1.y);
 
-            ledgeClimbPos2 = isFacingRight 
+            ledgeClimbPos2 = isFacingRight
                 ? ledgeBottomPos + new Vector2(wallCheckDistance + ledgeClimbOffset2.x, ledgeClimbOffset2.y)
                 : ledgeBottomPos + new Vector2(-wallCheckDistance - ledgeClimbOffset2.x, ledgeClimbOffset2.y);
 
@@ -278,4 +279,5 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(wallCheckPoint.position, wallCheckPoint.position + gizmoDirection * wallCheckDistance);
         Gizmos.DrawLine(ledgeCheckPoint.position, ledgeCheckPoint.position + gizmoDirection * wallCheckDistance);
     }
+    //Biuld for Moblie
 }
